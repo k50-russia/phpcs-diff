@@ -138,10 +138,10 @@ class PhpcsDiff
             );
         }
 
-        $phpcsOutput = $this->runPhpcs($fileDiff);
-
+        $phpcsOutputStr = $this->runPhpcs($fileDiff);
+        $phpcsOutput = json_decode($phpcsOutputStr,true);
         if (is_null($phpcsOutput)) {
-            $this->error('Unable to run phpcs executable.');
+            $this->error('Unable to run phpcs executable.' . PHP_EOL . $phpcsOutputStr);
             return;
         }
 
@@ -202,10 +202,9 @@ class PhpcsDiff
             $exec = realpath(__DIR__ . '/../bin/phpcs');
         }
 
-        return json_decode(
-            shell_exec($exec . ' --report=json --standard=' . $ruleset . ' ' . implode(' ', $files)),
-            true
-        );
+        $cmd = $exec . ' --report=json --standard=' . $ruleset . ' ' . implode(' ', $files);
+
+        return shell_exec($cmd);
     }
 
     /**
@@ -228,9 +227,8 @@ class PhpcsDiff
     protected function getChangedFiles()
     {
         // Get a list of changed files (not including deleted files)
-        $output = shell_exec(
-            'git diff ' . $this->baseBranch . ' ' . $this->currentBranch . ' --name-only --diff-filter=ACM'
-        );
+        $cmd = 'git diff ' . $this->baseBranch . ' ' . $this->currentBranch . ' --name-only --diff-filter=ACM';
+        $output = shell_exec($cmd);
 
         // Convert files into an array
         $output = explode(PHP_EOL, $output);

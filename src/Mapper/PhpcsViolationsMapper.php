@@ -44,7 +44,7 @@ class PhpcsViolationsMapper implements MapperInterface
                 if (!in_array($message['line'], $changedLinesFromDiff, true)) {
                     continue;
                 }
-                $output[] = ' - Line ' . $message['line'] . ' (' . $message['type'] . ') ' . $message['message'];
+                $output[] = " - Line {$message['line']}:{$message['column']} ({$message['type']}) {$message['message']} ({$message['source']})";
             }
 
             if (empty($output)) {
